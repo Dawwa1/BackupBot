@@ -7,21 +7,6 @@ import traceback
 
 from nextcord import Guild, TextChannel
 
-"""
-
-Figure out a good way to organize all file-handling code in a class
-to both backup and restore messages.
-
-Idea 1:
-    - single backup class that handles only backups, so if you are restoring a backup, you will need to
-    read the file and then pass the data to the backup function to get the messages.
-    
-    Problems:
-        NOT ANYMORE- not very efficient, all libraries to restore messages are already here but I have to also import them in the restore command file.
-        NOT ANYMORE- checking if backup exists doesn't work
-
-"""
-
 class Backup:
     # kinda shit because if restoring, data is gonna be None and idk how to handle errors :)
     def __init__(self, data: bytes | list | None, path_to_backup: str | None):

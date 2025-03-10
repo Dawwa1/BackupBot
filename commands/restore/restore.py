@@ -60,8 +60,7 @@ class Dropdown(nextcord.ui.Select):
                 await interaction.channel.send(embed=embed)
                 embed.clear_fields()
             
-            # error if content > 1024 characters
-            # will have to split it into multiple embeds
+            
             embed.add_field(name="Content", value=message_content)
             
             await interaction.channel.send(embed=embed)
@@ -107,8 +106,6 @@ class Restore(commands.Cog):
             view = DropdownView(available_backups=os.listdir(channel_backups), channel_backups=channel_backups)
             
             await interaction.send("Pick a backup to restore", view=view, ephemeral=True)
-            #print(messages[0])
-            #await interaction.send("Restored messages", ephemeral=True)
             
         except IndexError:
             await interaction.send("No backups found for this channel", ephemeral=True)
