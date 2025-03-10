@@ -21,27 +21,13 @@ class Backup(commands.Cog):
         if not channel:
             channel = interaction.channel
         
-        try:
-            messages = []
-            async for msg in channel.history(limit=message_count):
-                msg: nextcord.Message = msg
-                
-                if not msg.author.bot and not msg.embeds:
-                    data = {
-                        "author": msg.author.id,
-                        "content": msg.content,
-                        "attachments": [attachment.url for attachment in msg.attachments],
-                        "created_at": msg.created_at.timestamp()
-                    }
-                    
-                    messages.append(data)
-                    
-            backup = bkup(messages, None)
+        try:    
+            backup = bkup(channel, message_count, None)
             resp = await backup.create_new(interaction.guild, channel)
             if not resp:
                 await interaction.response.send_message(f"Backup of {channel.mention} already exists", ephemeral=True)
             else:
-                await interaction.response.send_message(f"Backup of {channel.mention} has been created\n{len(messages)} messages backed up.", ephemeral=True)
+                await interaction.response.send_message(f"Backup of {channel.mention} has been created", ephemeral=True)
                     
         except Exception:
             print(traceback.format_exc())

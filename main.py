@@ -1,5 +1,6 @@
 import nextcord
 from nextcord.ext import commands
+from nextcord.ext.commands import errors # type: ignore
 
 import os
 import fnmatch
@@ -20,7 +21,7 @@ for path, subdirs, files in os.walk(folder):
             try:
                 client.load_extension(path)
                 print(f"Loaded {path}")
-            except nextcord.ext.commands.errors.NoEntryPointError as e:
+            except errors.NoEntryPointError as e:
                 print(f"Error loading {path}: {e}")
 
 @client.event

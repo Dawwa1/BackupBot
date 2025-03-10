@@ -4,19 +4,50 @@ import zlib
 import json
 import os
 import traceback
+import urllib.request
 
-from nextcord import Guild, TextChannel
+from nextcord import Guild, TextChannel, Message
 
 class Backup:
     # kinda shit because if restoring, data is gonna be None and idk how to handle errors :)
-    def __init__(self, data: bytes | list | None, path_to_backup: str | None):
-        self.data = data
+    def __init__(self, channel, backup_limit: int | None, path_to_backup: str | None):
         self.channel_backup = path_to_backup
         
+        self.channel = channel
+        self.backup_limit = backup_limit
+        
         self.backup_folder = "backups"
+            
+    
+    @staticmethod
+    def get_image_in_message(message: Message):
+        pic_ext = [".jpg", ".png", ".jpeg", '.gif']
+        images = []
+        for attachment in message.attachments:
+            if attachment.filename in pic_ext:
+                images.append(attachment.url)
+                
+        return images
+    
+    async def messages_as_json(self, channel: TextChannel, backup_limit):
+        messages = []
+        async for msg in channel.history(limit=backup_limit):
+            if not msg.author.bot and not msg.embeds:
+                data = {
+                    "author": msg.author.id,
+                    "content": msg.content,
+                    "attachments": [attachment.url for attachment in msg.attachments],
+                    "images": Backup.get_image_in_message(msg),
+                    "created_at": msg.created_at.timestamp()
+                }
+                
+                messages.append(data)
+                
+        return messages
         
     async def create_new(self, guild: Guild, channel: TextChannel) -> bool:
         try:
+            data = await self.messages_as_json(channel, self.backup_limit)
             
             guild_backups = f"{self.backup_folder}/{guild.name}"
             channel_backups = f"{guild_backups}/{channel.name}"
@@ -26,7 +57,7 @@ class Backup:
             os.makedirs(channel_backups) if not os.path.exists(channel_backups) else None
 
             backup_path = f"{channel_backups}/{datetime.now().strftime('%m-%d_%H-%M-%S')}.backup"
-            backup = zlib.compress(json.dumps(self.data).encode("utf-8"))
+            backup = zlib.compress(json.dumps(data).encode("utf-8"))
             
             # checks if same backup exists (checks only last backup)
             if len(os.listdir(channel_backups)) > 0:

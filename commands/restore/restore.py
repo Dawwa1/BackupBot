@@ -1,9 +1,11 @@
+import aiohttp
 import nextcord
 import traceback
 from nextcord.ext import commands, application_checks
 from nextcord import SlashOption
 
 import os
+import io
 from time import strftime, localtime
 from client.Backup.Backup import Backup as bkup
 
@@ -38,7 +40,7 @@ class Dropdown(nextcord.ui.Select):
         # Select object, and the values attribute gets a list of the user's
         # selected options. We only want the first one.
         
-        backup = bkup(None, self.channel_backups)
+        backup = bkup(None, None, self.channel_backups)
         messages = backup.get_messages()
         
         for message in reversed(messages):
@@ -53,17 +55,34 @@ class Dropdown(nextcord.ui.Select):
             embed.set_footer(text=time)
             
             message_content = message["content"]
+            
+            # if message content is too long, split it into multiple fields
             if len(message_content) > 1024:
+                
                 message_content1 = message_content[:1021] + ".." # goes to 1023 (1021 + 2 dots)
                 message_content = message_content[1021:]
+                
                 embed.add_field(name="Content", value=message_content1)
                 await interaction.channel.send(embed=embed)
+                
                 embed.clear_fields()
             
             
             embed.add_field(name="Content", value=message_content)
             
-            await interaction.channel.send(embed=embed)
+            files = []
+            c = 0
+            for url in message["attachments"]:
+                c += 1
+                async with aiohttp.ClientSession() as session: # creates session
+                    async with session.get(url) as resp: # gets image from url
+                        img = await resp.read() # reads image from response
+                        with io.BytesIO(img) as file: # converts to file-like object
+                            files.append(nextcord.File(file, f"tmp{c}.png"))
+            
+            
+            
+            await interaction.channel.send(embed=embed, files=files)
 
 
 class DropdownView(nextcord.ui.View):
@@ -99,9 +118,6 @@ class Restore(commands.Cog):
             if len(os.listdir(channel_backups)) == 0:
                 await interaction.send("No backups found for this channel", ephemeral=True)
                 return
-
-            backup = bkup(None, channel_backups)
-            backup.get_messages()
             
             view = DropdownView(available_backups=os.listdir(channel_backups), channel_backups=channel_backups)
             
