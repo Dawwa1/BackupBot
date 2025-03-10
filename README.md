@@ -2,8 +2,6 @@
 
 A simple bot that backs up discord messages to a JSON file and allows you to restore them!
 
----
-
 ## Installation
 - Install [Python 3.12+](https://www.python.org/downloads/)
 - Clone the repository
