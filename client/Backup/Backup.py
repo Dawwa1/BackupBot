@@ -4,7 +4,6 @@ import zlib
 import json
 import os
 import traceback
-import urllib.request
 
 from nextcord import Guild, TextChannel, Message
 
