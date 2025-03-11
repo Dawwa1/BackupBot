@@ -1,6 +1,6 @@
 # PUBLIC VERSION BRANCH
 
-public version of the bot that basically acts as an API for mongodb
+public version of the bot that will basically acts as an API for mongodb
 
 ## Idea:
 - You invite the bot to your server and run `/setup`
@@ -14,5 +14,11 @@ public version of the bot that basically acts as an API for mongodb
     - `/backup {channel} {# of messages}` - backs up amt of messages from `{channel}` to database
     - `/restore {channel}` - restores messages from database to `{channel}`
     - `/clear {channel} {# of messages}` - clears amt of messages from `{channel}`
-    - `list {server}` - lists all the channels and their servers that have been backed up
+    - `/list {server}` - lists all the channels and their servers that have been backed up
     - `/help` - shows help message
+
+
+## Free vs Premium
+
+- Free version:
+ 
