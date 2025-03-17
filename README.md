@@ -14,4 +14,8 @@ A simple bot that backs up discord messages to a JSON file and allows you to res
 - Run the bot
 > *(Linux)* `python3 bot.py` **or** `python bot.py` *(Windows)*
 
----
+
+## Commands
+- `/backup {channel} {message amount}` - Backs up x amount of messages from a channel
+- `/restore {channel}` - Restores a backup you have saved
+- `/clear {message amount}` - Deletes x amount of messages from the current channel
